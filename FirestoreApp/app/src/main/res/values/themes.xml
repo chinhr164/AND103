@@ -3,6 +3,8 @@
     <style name="Base.Theme.FirestoreApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="Theme.FirestoreApp" parent="Base.Theme.FirestoreApp" />
