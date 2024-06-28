@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoHolder>{
   public interface OnClickListener{
-    void onItemClick(int position);
+    void onItemClick(int position, View v);
   }
 
   private List<Todo> list;
@@ -61,7 +61,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoHolder>{
       binding.tvTitle.setText(todo.getTitle());
       binding.tvContent.setText(todo.getContent());
       itemView.setOnClickListener(v->{
-        listener.onItemClick(pos);
+        listener.onItemClick(pos, itemView);
       });
     }
   }

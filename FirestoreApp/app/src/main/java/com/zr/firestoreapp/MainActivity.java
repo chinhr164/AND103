@@ -2,7 +2,11 @@ package com.zr.firestoreapp;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -11,12 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -24,9 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.zr.firestoreapp.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity{
   private ActivityMainBinding binding;
@@ -72,8 +72,23 @@ public class MainActivity extends AppCompatActivity{
           }
         }
         try {
-          adapter=new TodoAdapter(list, MainActivity.this, position->{
-            Toast.makeText(MainActivity.this, list.get(position).content, Toast.LENGTH_SHORT).show();
+          adapter=new TodoAdapter(list, MainActivity.this, (position, v)->{
+            PopupMenu popup=new PopupMenu(MainActivity.this, v);
+            popup.inflate(R.menu.option_menu);
+            popup.setGravity(Gravity.END);
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
+              @Override
+              public boolean onMenuItemClick(MenuItem item){
+                if (item.getItemId()==R.id.opt_update) {
+                  return true;
+                }
+                if (item.getItemId()==R.id.opt_delete) {
+                  return true;
+                }
+                return false;
+              }
+            });
+            popup.show();
           });
           binding.rcvTodo.setAdapter(adapter);
         } catch (Exception e) {
