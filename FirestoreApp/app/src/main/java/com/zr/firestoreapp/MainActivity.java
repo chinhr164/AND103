@@ -29,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.zr.firestoreapp.databinding.ActivityMainBinding;
 import com.zr.firestoreapp.databinding.DialogAddBinding;
+import com.zr.firestoreapp.databinding.DialogUpdateBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +94,32 @@ public class MainActivity extends AppCompatActivity{
     dialog.show();
   }
 
+  public void updateDialog(int pos){
+    DialogUpdateBinding updateBinding=DialogUpdateBinding.inflate(getLayoutInflater());
+    Dialog dialog=new Dialog(MainActivity.this);
+    dialog.setContentView(updateBinding.getRoot());
+    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    String id=list.get(pos).getId();
+    updateBinding.dialogEdTitle.setText(list.get(pos).getTitle());
+    updateBinding.dialogEdContent.setText(list.get(pos).getContent());
+    updateBinding.dialogBtnUpdate.setOnClickListener(v->{
+      String title=updateBinding.dialogEdTitle.getText().toString().trim();
+      String content=updateBinding.dialogEdContent.getText().toString().trim();
+      if (title.isEmpty() || content.isEmpty()) {
+        Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+      } else {
+        updateToFirestore(id, title, content);
+        dialog.dismiss();
+      }
+    });
+
+    updateBinding.dialogBtnCancel.setOnClickListener(v->{
+      dialog.dismiss();
+    });
+
+    dialog.show();
+  }
+
   public void getFromFirestore(){
     database.collection("TODO").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>(){
       @Override
@@ -113,7 +140,7 @@ public class MainActivity extends AppCompatActivity{
               @Override
               public boolean onMenuItemClick(MenuItem item){
                 if (item.getItemId()==R.id.opt_update) {
-                  return true;
+                  updateDialog(position);
                 }
                 if (item.getItemId()==R.id.opt_delete) {
                   AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
@@ -166,6 +193,23 @@ public class MainActivity extends AppCompatActivity{
       @Override
       public void onFailure(@NonNull Exception e){
         Toast.makeText(MainActivity.this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
+        Log.e("TAG Error", "onFailure: ", e);
+      }
+    });
+  }
+
+  public void updateToFirestore(String id, String title, String content){
+    Todo todo=new Todo(id, title, content);
+    database.collection("TODO").document(todo.getId()).update(todo.convertHashMap()).addOnSuccessListener(new OnSuccessListener<Void>(){
+      @Override
+      public void onSuccess(Void unused){
+        Toast.makeText(MainActivity.this, "Sửa thành công", Toast.LENGTH_SHORT).show();
+        getFromFirestore();
+      }
+    }).addOnFailureListener(new OnFailureListener(){
+      @Override
+      public void onFailure(@NonNull Exception e){
+        Toast.makeText(MainActivity.this, "Sửa thất bại", Toast.LENGTH_SHORT).show();
         Log.e("TAG Error", "onFailure: ", e);
       }
     });
