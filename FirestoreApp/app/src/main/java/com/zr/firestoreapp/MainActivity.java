@@ -3,14 +3,13 @@ package com.zr.firestoreapp;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -83,7 +82,15 @@ public class MainActivity extends AppCompatActivity{
                   return true;
                 }
                 if (item.getItemId()==R.id.opt_delete) {
-                  return true;
+                  AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+                  builder.setTitle("Thông báo");
+                  builder.setMessage("Bạn muốn xóa?");
+
+                  builder.setNegativeButton("Xác nhận", (dialog, which)->{
+                    deleteToFirestore(list.get(position).getId());
+                  });
+
+                  builder.show();
                 }
                 return false;
               }
@@ -101,6 +108,16 @@ public class MainActivity extends AppCompatActivity{
         Toast.makeText(MainActivity.this, "Lấy dữ liệu thất bại", Toast.LENGTH_SHORT).show();
         Log.e("TAG Error", "onFailure: ", e);
       }
+    });
+  }
+
+  public void deleteToFirestore(String id){
+    database.collection("TODO").document(id).delete().addOnSuccessListener(unused->{
+      Toast.makeText(this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+      getFromFirestore();
+    }).addOnFailureListener(e->{
+      Toast.makeText(this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
+      Log.e("TAG Error", "deleteToFirestore: ", e);
     });
   }
 }
