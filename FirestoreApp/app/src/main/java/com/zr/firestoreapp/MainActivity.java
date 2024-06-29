@@ -1,9 +1,13 @@
 package com.zr.firestoreapp;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -18,14 +22,18 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.zr.firestoreapp.databinding.ActivityMainBinding;
+import com.zr.firestoreapp.databinding.DialogAddBinding;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity{
   private ActivityMainBinding binding;
@@ -57,6 +65,32 @@ public class MainActivity extends AppCompatActivity{
         getFromFirestore();
       }
     });
+
+    binding.fabInsert.setOnClickListener(v->{
+      addDialog();
+    });
+  }
+
+  public void addDialog(){
+    DialogAddBinding addBinding=DialogAddBinding.inflate(getLayoutInflater());
+    Dialog dialog=new Dialog(MainActivity.this);
+    dialog.setContentView(addBinding.getRoot());
+    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    addBinding.dialogBtnAdd.setOnClickListener(v->{
+      String title=addBinding.dialogEdTitle.getText().toString().trim();
+      String content=addBinding.dialogEdContent.getText().toString().trim();
+      if (title.isEmpty() || content.isEmpty()) {
+        Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+      } else {
+        insertToFirestore(title, content);
+        dialog.dismiss();
+      }
+    });
+    addBinding.dialogBtnCancel.setOnClickListener(v->{
+      dialog.dismiss();
+    });
+
+    dialog.show();
   }
 
   public void getFromFirestore(){
@@ -118,6 +152,22 @@ public class MainActivity extends AppCompatActivity{
     }).addOnFailureListener(e->{
       Toast.makeText(this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
       Log.e("TAG Error", "deleteToFirestore: ", e);
+    });
+  }
+
+  public void insertToFirestore(String title, String content){
+    String id=UUID.randomUUID().toString();
+    Todo todo=new Todo(id, title, content);
+    HashMap<String, Object> hashMap=todo.convertHashMap();
+    database.collection("TODO").document(id).set(hashMap).addOnSuccessListener(unused->{
+      Toast.makeText(MainActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
+      getFromFirestore();
+    }).addOnFailureListener(new OnFailureListener(){
+      @Override
+      public void onFailure(@NonNull Exception e){
+        Toast.makeText(MainActivity.this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
+        Log.e("TAG Error", "onFailure: ", e);
+      }
     });
   }
 }
