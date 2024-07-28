@@ -1,12 +1,13 @@
 package com.zr.retrofitapp;
 
 public class Student{
-  private String id, name, mark;
+  private String id, name;
+  private double mark;
 
   public Student(){
   }
 
-  public Student(String id, String name, String mark){
+  public Student(String id, String name, Double mark){
     this.id=id;
     this.name=name;
     this.mark=mark;
@@ -28,11 +29,11 @@ public class Student{
     this.name=name;
   }
 
-  public String getMark(){
+  public double getMark(){
     return mark;
   }
 
-  public void setMark(String mark){
+  public void setMark(double mark){
     this.mark=mark;
   }
 }
