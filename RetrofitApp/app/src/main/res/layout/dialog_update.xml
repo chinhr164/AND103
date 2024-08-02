@@ -30,23 +30,19 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+        <TextView
+            android:id="@+id/dialogTvID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="8sp"
-            android:background="#1AA6A6A6"
-            app:boxStrokeWidth="0sp"
-            app:endIconMode="clear_text"
-            app:hintEnabled="false">
-
-            <EditText
-                android:id="@+id/dialogEdID"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Nhập mã sinh viên"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:background="#F4EEF5"
+            android:paddingHorizontal="16sp"
+            android:paddingVertical="20sp"
+            android:text="Nhập mã sinh viên"
+            android:textColor="#ABA5AC"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

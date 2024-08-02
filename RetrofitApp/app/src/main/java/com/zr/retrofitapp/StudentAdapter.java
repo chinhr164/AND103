@@ -15,7 +15,7 @@ import java.util.List;
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentHolder>{
   public interface OnClickListener{
-    void onItemClick(int position, View v);
+    void onItemClick(Student student, View v);
   }
 
   private List<Student> list;
@@ -37,7 +37,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
 
   @Override
   public void onBindViewHolder(@NonNull StudentHolder holder, int position){
-    holder.bind(list.get(position), onClickListener, position);
+    holder.bind(list.get(position), onClickListener);
   }
 
   @Override
@@ -54,10 +54,13 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
     }
 
     @SuppressLint("SetTextI18n")
-    public void bind(Student student, OnClickListener listener, int pos){
+    public void bind(Student student, OnClickListener listener){
       binding.tvID.setText(student.getId());
       binding.tvName.setText(student.getName());
       binding.tvMark.setText(student.getMark()+"");
+      itemView.setOnClickListener(v->{
+        listener.onItemClick(student, itemView);
+      });
     }
   }
 }
