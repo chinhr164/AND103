@@ -62,16 +62,19 @@ public class MainActivity extends AppCompatActivity{
       @Override
       public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
         if (response.isSuccessful()) {
+          Toast.makeText(MainActivity.this, "Lấy dữ liệu thành oông", Toast.LENGTH_SHORT).show();
           List<Student> list=response.body();
           Log.d("TAG Debug", "onResponse: "+list.size());
           show(list);
         } else {
+          Toast.makeText(MainActivity.this, "Lấy dữ liệu thất bại", Toast.LENGTH_SHORT).show();
           Log.e("TAG Error", "onResponse: "+response.errorBody());
         }
       }
 
       @Override
       public void onFailure(Call<List<Student>> call, Throwable t){
+        Toast.makeText(MainActivity.this, "Lấy dữ liệu thất bại", Toast.LENGTH_SHORT).show();
         Log.e("TAG Error", "onFailure: "+t.getMessage());
       }
     });
@@ -82,16 +85,19 @@ public class MainActivity extends AppCompatActivity{
       @Override
       public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
         if (response.isSuccessful()) {
+          Toast.makeText(MainActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
           List<Student> list=response.body();
           Log.d("TAG Debug", "onResponse: "+list.size());
           show(list);
         } else {
+          Toast.makeText(MainActivity.this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
           Log.e("TAG Error", "onResponse: "+response.errorBody());
         }
       }
 
       @Override
       public void onFailure(Call<List<Student>> call, Throwable t){
+        Toast.makeText(MainActivity.this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
         Log.e("TAG Error", "onFailure: "+t.getMessage());
       }
     });
@@ -102,16 +108,42 @@ public class MainActivity extends AppCompatActivity{
       @Override
       public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
         if (response.isSuccessful()) {
+          Toast.makeText(MainActivity.this, "Sửa thành oông", Toast.LENGTH_SHORT).show();
           List<Student> list=response.body();
           Log.d("TAG Debug", "onResponse: "+list.size());
           show(list);
         } else {
+          Toast.makeText(MainActivity.this, "Sửa thất bại", Toast.LENGTH_SHORT).show();
           Log.e("TAG Error", "onResponse: "+response.errorBody());
         }
       }
 
       @Override
       public void onFailure(Call<List<Student>> call, Throwable t){
+        Toast.makeText(MainActivity.this, "Sửa thất bại", Toast.LENGTH_SHORT).show();
+        Log.e("TAG Error", "onFailure: "+t.getMessage());
+      }
+    });
+  }
+
+  private void deleteData(String id){
+    request.callAPI().deleteData(id).enqueue(new Callback<List<Student>>(){
+      @Override
+      public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
+        if (response.isSuccessful()) {
+          Toast.makeText(MainActivity.this, "Xoá thành công", Toast.LENGTH_SHORT).show();
+          List<Student> list=response.body();
+          Log.d("TAG Debug", "onResponse: "+list.size());
+          show(list);
+        } else {
+          Toast.makeText(MainActivity.this, "Xoá thất bại", Toast.LENGTH_SHORT).show();
+          Log.e("TAG Error", "onResponse: "+response.errorBody());
+        }
+      }
+
+      @Override
+      public void onFailure(Call<List<Student>> call, Throwable t){
+        Toast.makeText(MainActivity.this, "Xoá thất bại", Toast.LENGTH_SHORT).show();
         Log.e("TAG Error", "onFailure: "+t.getMessage());
       }
     });
@@ -134,7 +166,7 @@ public class MainActivity extends AppCompatActivity{
             builder.setMessage("Bạn muốn xóa?");
 
             builder.setNegativeButton("Xác nhận", (dialog, which)->{
-              //              deleteToFirestore(list.get(position).getId());
+              deleteData(student.getId());
             });
 
             builder.show();
