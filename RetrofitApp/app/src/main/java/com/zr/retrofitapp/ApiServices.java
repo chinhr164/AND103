@@ -12,17 +12,18 @@ import retrofit2.http.Path;
 
 public interface ApiServices{
 
-  public static String BASE_URL="http://10.0.2.2:3000/api";
+  public static final String IP="192.168.0.100";
+  public static String BASE_URL="http://"+IP+":3000/api/";
 
-  @GET("/student")
+  @GET("student")
   Call<List<Student>> getAll();  //Lấy danh sách dữ liệu
 
-  @POST("/student")
+  @POST("student")
   Call<List<Student>> postData(@Body Student student); //Thêm đối tượng mới
 
-  @PUT("/student/{id}")
+  @PUT("student/{id}")
   Call<List<Student>> putData(@Path("id") String id, @Body Student student); //Sửa 1 đối tượng có sẵn
 
-  @DELETE("/student/{id}")
+  @DELETE("student/{id}")
   Call<List<Student>> deleteData(@Path("id") String id); //Xoá 1 đối tượng
 }
