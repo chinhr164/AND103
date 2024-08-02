@@ -1,11 +1,11 @@
 package com.zr.retrofitapp;
 
-import static com.zr.retrofitapp.ApiServices.BASE_URL;
-
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -15,20 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.zr.retrofitapp.databinding.ActivityMainBinding;
+import com.zr.retrofitapp.databinding.DialogAddBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity{
   private ActivityMainBinding binding;
@@ -48,15 +43,42 @@ public class MainActivity extends AppCompatActivity{
       return insets;
     });
 
-    binding.srLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
-      @Override
-      public void onRefresh(){
-        binding.srLayout.setRefreshing(false);
-      }
+    binding.srLayout.setOnRefreshListener(()->{
+      binding.srLayout.setRefreshing(false);
+      getData();
     });
 
     request=new HttpRequest();
+
+    getData();
+    binding.fabInsert.setOnClickListener(v->{
+      addDialog();
+    });
+  }
+
+  public void getData(){
     request.callAPI().getAll().enqueue(new Callback<List<Student>>(){
+      @Override
+      public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
+        if (response.isSuccessful()) {
+          List<Student> list=response.body();
+          Log.d("TAG Debug", "onResponse: "+list.size());
+          show(list);
+        } else {
+          Log.e("TAG Error", "onResponse: "+response.errorBody());
+        }
+      }
+
+      @Override
+      public void onFailure(Call<List<Student>> call, Throwable t){
+        Log.e("TAG Error", "onFailure: "+t.getMessage());
+      }
+    });
+  }
+
+  private void insertData(String id, String name, double mark){
+    Student student=new Student(id, name, mark);
+    request.callAPI().postData(student).enqueue(new Callback<List<Student>>(){
       @Override
       public void onResponse(Call<List<Student>> call, Response<List<Student>> response){
         if (response.isSuccessful()) {
@@ -103,5 +125,38 @@ public class MainActivity extends AppCompatActivity{
       popup.show();
     }));
     binding.rcvStudent.setAdapter(adapter);
+  }
+
+  private void addDialog(){
+    DialogAddBinding addBinding=DialogAddBinding.inflate(getLayoutInflater());
+    Dialog dialog=new Dialog(MainActivity.this);
+    dialog.setContentView(addBinding.getRoot());
+    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    addBinding.dialogBtnAdd.setOnClickListener(v->{
+      String id=addBinding.dialogEdID.getText().toString().trim();
+      String name=addBinding.dialogEdName.getText().toString().trim();
+      String markString=addBinding.dialogEdMark.getText().toString().trim();
+
+      if (id.isEmpty() || name.isEmpty() || markString.isEmpty()) {
+        Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+      } else {
+        double mark;
+        try {
+          mark=Double.parseDouble(markString);
+          if (mark<0 || mark>10) {
+            Toast.makeText(this, "Giá trị phải nằm trong khoảng 0-10", Toast.LENGTH_SHORT).show();
+          } else {
+            insertData(id, name, mark);
+            dialog.dismiss();
+          }
+        } catch (Exception e) {
+          Toast.makeText(this, "Vui lòng nhập giá trị là số nguyên", Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+    addBinding.dialogBtnCancel.setOnClickListener(v->{
+      dialog.dismiss();
+    });
+    dialog.show();
   }
 }
